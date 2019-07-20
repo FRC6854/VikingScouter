@@ -1,15 +1,8 @@
-# dynamic_scouting_app
+# Viking Scouter
 
-A new Flutter project.
+A dynamic robot scouting app that allows editing from JSON and build the app using an assortment of Widgets. The result is a multi-device app that is easy to upgrade for many competitions to come!
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## About Flutter
 
 For help getting started with Flutter, view our
 [online documentation](https://flutter.dev/docs), which offers tutorials,
