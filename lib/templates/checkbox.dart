@@ -1,0 +1,24 @@
+import 'package:flutter/material.dart';
+
+Widget checkboxWidget (String name, int value, int index, Function onChange) {
+  bool checkboxValue;
+
+  if(value == 0)
+    checkboxValue = false;
+  if(value == 1)
+    checkboxValue = true;
+
+  return Container(
+    margin: EdgeInsets.only(left: 50, right: 50),
+    child: Column(
+      children: <Widget>[
+        Text(name),
+        Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
+        Checkbox(
+          value: checkboxValue,
+          onChanged: (boolValue) => onChange(index, boolValue),
+        )
+      ],
+    )
+  );
+}
