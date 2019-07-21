@@ -3,6 +3,7 @@ import 'models/items.dart';
 import 'templates/counter.dart';
 import 'templates/number.dart';
 import 'templates/checkbox.dart';
+import 'templates/header.dart';
 import 'util/constants.dart';
 
 void main() => runApp(MyApp());
@@ -36,11 +37,15 @@ class _MyHomePageState extends State<MyHomePage> {
           )),
         centerTitle: true,
       ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.check),
+        onPressed: () => _showDialog(),
+      ),
       body: Center(
         child: Container(
           child: Column(
             children: <Widget>[
-              Divider(height: 20, color: Constants.darkAccent, indent: 5, endIndent: 5,),
+              //Divider(height: 20, color: Constants.darkAccent, indent: 5, endIndent: 5,),
               Expanded(
                 child: ListView.separated(
                   separatorBuilder: (context, index) => Divider(
@@ -57,15 +62,13 @@ class _MyHomePageState extends State<MyHomePage> {
                     if(items.items[index].type == "checkbox") {
                       return checkboxWidget(items.items[index].name, items.items[index].value, index, onChangeCheckbox);
                     }
+                    if(items.items[index].type == "header") {
+                      return headerWidget(items.items[index].name, index);
+                    }
+
+                    return Text("Error parsing JSON, invalid type of Widget in ${items.items[index].name} of type: ${items.items[index].type}");
                   },
                 ),
-              ),
-              
-              RaisedButton(
-                child: Text("Done"), 
-                onPressed: () => printData(),
-                color: Constants.darkAccent,
-                textColor: Constants.darkBG,
               )
             ],
           )
@@ -91,6 +94,36 @@ class _MyHomePageState extends State<MyHomePage> {
       if(value == true)
         items.items[index].value = 1;
     });
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Warning", style: TextStyle(color: Constants.darkBG)),
+          content: new Text("Are you sure you want to continue?", style: TextStyle(color: Constants.darkBG)),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Continue", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                printData();
+              },
+            ),
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          backgroundColor: Constants.darkAccent,
+        );
+      },
+    );
   }
 
   void printData(){

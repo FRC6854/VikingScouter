@@ -1,6 +1,11 @@
 Map<String, dynamic> json = {
   "items": [
     {
+      "name": "Sandstorm",
+      "type": "header",
+      "value": 0
+    },
+    {
       "name": "Cargo Ship Hatch Panels Sandstorm",
       "type": "counter",
       "value": 0
@@ -26,6 +31,11 @@ Map<String, dynamic> json = {
       "value": 0
     },
     {
+      "name": "Teleop",
+      "type": "header",
+      "value": 0
+    },
+    {
       "name": "Cargo Ship Hatch Panels",
       "type": "counter",
       "value": 0
@@ -46,6 +56,11 @@ Map<String, dynamic> json = {
       "value": 0
     },
     {
+      "name": "Endgame",
+      "type": "header",
+      "value": 0
+    },
+    {
       "name": "Total RP",
       "type": "number",
       "value": 0
@@ -60,7 +75,11 @@ Map<String, dynamic> json = {
       "type": "number",
       "value": 0
     },
-    
+    {
+      "name": "Level of Climb",
+      "type": "dick",
+      "value": 0
+    },
   ]
 };
 
