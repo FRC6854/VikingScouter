@@ -3,6 +3,7 @@ import 'models/items.dart';
 import 'templates/counter.dart';
 import 'templates/number.dart';
 import 'templates/checkbox.dart';
+import 'util/constants.dart';
 
 void main() => runApp(MyApp());
 
@@ -12,10 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: Constants.darkTheme,
       home: MyHomePage(),
     );
   }
@@ -31,14 +29,18 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("6854 Dynamic Scouting App"),
+        title: Text("6854 Dynamic Scouting App", style: TextStyle(
+          fontSize: 25,
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Aileron',
+          )),
         centerTitle: true,
       ),
       body: Center(
         child: Container(
-          margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
           child: Column(
             children: <Widget>[
+              Divider(height: 20, color: Constants.darkAccent, indent: 5, endIndent: 5,),
               Expanded(
                 child: ListView.separated(
                   separatorBuilder: (context, index) => Divider(
@@ -59,7 +61,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               
-              RaisedButton(child: Text("Done"), onPressed: () => printData())
+              RaisedButton(
+                child: Text("Done"), 
+                onPressed: () => printData(),
+                color: Constants.darkAccent,
+                textColor: Constants.darkBG,
+              )
             ],
           )
         ),

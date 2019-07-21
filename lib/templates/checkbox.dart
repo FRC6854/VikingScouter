@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:dynamic_scouting_app/util/constants.dart';
 
 Widget checkboxWidget (String name, int value, int index, Function onChange) {
   bool checkboxValue;
@@ -17,6 +18,8 @@ Widget checkboxWidget (String name, int value, int index, Function onChange) {
         Checkbox(
           value: checkboxValue,
           onChanged: (boolValue) => onChange(index, boolValue),
+          checkColor: Constants.darkAccent,
+          activeColor: Constants.darkBG,
         )
       ],
     )
