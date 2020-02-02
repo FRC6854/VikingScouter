@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_scouting_app/util/constants.dart';
+import 'package:viking_scouter/util/constants.dart';
 
-Widget checkboxWidget (String name, int value, int index, Function onChange) {
-  bool checkboxValue;
-
-  if(value == 0)
-    checkboxValue = false;
-  if(value == 1)
-    checkboxValue = true;
+Widget checkboxWidget (String name, bool value, int index, Function onChange) {
+  bool checkboxValue = value;
 
   return Container(
     margin: EdgeInsets.only(left: 50, right: 50),
@@ -19,12 +14,15 @@ Widget checkboxWidget (String name, int value, int index, Function onChange) {
           fontSize: 15.0
         )),
         Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
-        Checkbox(
-          value: checkboxValue,
-          onChanged: (boolValue) => onChange(index, boolValue),
-          checkColor: Constants.darkAccent,
-          activeColor: Constants.darkBG,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        Transform.scale(
+            scale: 1.75,
+            child: Checkbox(
+              value: checkboxValue,
+              onChanged: (boolValue) => onChange(index, boolValue),
+              checkColor: Constants.darkAccent,
+              activeColor: Constants.darkBG,
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            )
         )
       ],
     )

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_scouting_app/util/constants.dart';
+import 'package:viking_scouter/util/constants.dart';
 
 Widget counterWidget (String name, int value, int index, Function onPushMethod) {
   return Container(

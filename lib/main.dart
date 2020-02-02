@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'util/constants.dart';
 import 'pages/matchDataInput.dart';
+import 'pages/mainMenu.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,7 +10,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: Constants.darkTheme,
-      home: MatchDataInputPage(),
+      home: MainMenuPage(),
     );
   }
 }

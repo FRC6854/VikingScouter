@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:viking_scouter/util/constants.dart';
 
-Widget numberWidget (String name, int value, int index, Function onChange) {
+Widget teamNumberWidget (String name, int value,  Function onChange) {
   var controller = new TextEditingController(text: value.toString());
 
   return Container(
@@ -17,22 +17,22 @@ Widget numberWidget (String name, int value, int index, Function onChange) {
         TextField(
           controller: controller,
           decoration: new InputDecoration(
-            labelText: "Enter number",
-            labelStyle: TextStyle(
-                fontFamily: "Open Sans",
-                fontWeight: FontWeight.w400,
-                fontSize: 15.0,
-                color: Constants.darkAccent
-            ),
-            border: UnderlineInputBorder(
-                borderSide: BorderSide(
-                    width: 0,
-                    style: BorderStyle.none
-                )
-            )
+              labelText: "Enter number",
+              labelStyle: TextStyle(
+                  fontFamily: "Open Sans",
+                  fontWeight: FontWeight.w400,
+                  fontSize: 15.0,
+                  color: Constants.darkAccent
+              ),
+              border: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                      width: 0,
+                      style: BorderStyle.none
+                  )
+              )
           ),
           keyboardType: TextInputType.number,
-          onSubmitted: (number) => onChange(index, int.parse(number)),
+          onSubmitted: (number) => onChange(int.parse(number)),
         ),
         Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
       ],

@@ -1,14 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:dynamic_scouting_app/util/constants.dart';
-import 'package:dynamic_scouting_app/models/items.dart';
-import 'package:dynamic_scouting_app/templates/counter.dart';
-import 'package:dynamic_scouting_app/templates//number.dart';
-import 'package:dynamic_scouting_app/templates/checkbox.dart';
-import 'package:dynamic_scouting_app/templates/header.dart';
+import 'package:viking_scouter/models/settings.dart';
+import 'package:viking_scouter/util/constants.dart';
+import 'package:viking_scouter/models/items.dart';
+import 'package:viking_scouter/templates/counter.dart';
+import 'package:viking_scouter/templates/number.dart';
+import 'package:viking_scouter/templates/note.dart';
+import 'package:viking_scouter/templates/checkbox.dart';
+import 'package:viking_scouter/templates/header.dart';
 
-ItemsList items = ItemsList.fromJson(json);
+import 'package:viking_scouter/templates/match-number.dart';
+import 'package:viking_scouter/templates/team-number.dart';
+
+JSONData jsonData = JSONData.fromJson(jsonTemplateItems);
 
 class MatchDataInputPage extends StatefulWidget {
+  MatchDataInputPage(JSONData data) {
+    if (data == null) {
+      jsonData = JSONData.fromJson(jsonTemplateItems);
+    }
+    else {
+      jsonData = data;
+    }
+  }
+
   @override
   _MatchDataInputPageState createState() => _MatchDataInputPageState();
 }
@@ -19,10 +33,12 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text("6854 Dynamic Scouting App", style: TextStyle(
+          color: Constants.darkPrimary,
           fontSize: 25,
           fontWeight: FontWeight.w500,
-          fontFamily: 'Aileron',
-          )),
+          fontFamily: 'Aileron'
+        )),
+        backgroundColor: Constants.lightPrimary,
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
@@ -39,22 +55,32 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
                   separatorBuilder: (context, index) => Divider(
                     color: Colors.black,
                   ),
-                  itemCount: items.items.length,
+                  itemCount: jsonData.items.length,
                   itemBuilder: (context, index) {
-                    if(items.items[index].type == "counter") {
-                      return counterWidget(items.items[index].name, items.items[index].value, index, onPushCounter);
+                    if(jsonData.items[index].type == "counter") {
+                      return counterWidget(jsonData.items[index].name, jsonData.items[index].value, index, onPushCounter);
                     }
-                    if(items.items[index].type == "number") {
-                      return numberWidget(items.items[index].name, items.items[index].value, index, onChangeNumber);
+                    else if(jsonData.items[index].type == "number") {
+                      return numberWidget(jsonData.items[index].name, jsonData.items[index].value, index, onChangeNumber);
                     }
-                    if(items.items[index].type == "checkbox") {
-                      return checkboxWidget(items.items[index].name, items.items[index].value, index, onChangeCheckbox);
+                    else if(jsonData.items[index].type == "checkbox") {
+                      return checkboxWidget(jsonData.items[index].name, jsonData.items[index].value, index, onChangeCheckbox);
                     }
-                    if(items.items[index].type == "header") {
-                      return headerWidget(items.items[index].name, index);
+                    else if(jsonData.items[index].type == "header") {
+                      return headerWidget(jsonData.items[index].name, index);
                     }
-
-                    return Text("Error parsing JSON, invalid type of Widget in ${items.items[index].name} of type: ${items.items[index].type}");
+                    else if(jsonData.items[index].type == "note") {
+                      return noteWidget(jsonData.items[index].name, jsonData.items[index].value, index, onChangeNote);
+                    }
+                    else if(jsonData.items[index].type == "match-number") {
+                      return matchNumberWidget("Match Number", jsonData.match.matchNumber, onChangeMatchNumber);
+                    }
+                    else if(jsonData.items[index].type == "team-number") {
+                      return teamNumberWidget("Team Number", jsonData.match.teamNumber, onChangeTeamNumber);
+                    }
+                    else {
+                      return Text("Error parsing JSON, invalid type of Widget in ${jsonData.items[index].name} of type: ${jsonData.items[index].type}");
+                    }
                   },
                 ),
               )
@@ -67,24 +93,36 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
 
   void onPushCounter(int index, int multiplier) {
     setState(() {
-      items.items[index].value = items.items[index].value + (1 * multiplier);
+      jsonData.items[index].value = jsonData.items[index].value + (1 * multiplier);
     });
   }
 
   void onChangeNumber(int index, int value) {
-    items.items[index].value = value;
+    jsonData.items[index].value = value;
+  }
+
+  void onChangeMatchNumber(int value) {
+    jsonData.match.matchNumber = value;
+  }
+
+  void onChangeTeamNumber(int value) {
+    jsonData.match.teamNumber = value;
   }
 
   void onChangeCheckbox(int index, bool value) {
     setState(() {
-      if(value == false)
-        items.items[index].value = 0;
-      if(value == true)
-        items.items[index].value = 1;
+      jsonData.items[index].value = value;
     });
   }
 
-  void _showDialog() {
+  void onChangeNote(int index, String value) {
+    jsonData.items[index].value = value;
+  }
+
+  void _showDialog() async {
+    Map<String, dynamic> settings = await getSettings();
+    jsonData.match.competition = Settings.fromJson(settings).currentCompetition;
+
     // flutter defined function
     showDialog(
       context: context,
@@ -95,14 +133,15 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
           content: new Text("Are you sure you want to continue?", style: TextStyle(color: Constants.darkBG)),
           actions: <Widget>[
             new FlatButton(
-              child: new Text("Continue", style: TextStyle(color: Constants.darkBG)),
+              child: new Text("SAVE", style: TextStyle(color: Constants.darkBG)),
               onPressed: () {
                 printData();
-              },
+                Navigator.of(context).pop();
+              }
             ),
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close", style: TextStyle(color: Constants.darkBG)),
+              child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -114,7 +153,8 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     );
   }
 
-  void printData(){
-    print(items.toJson());
+  void printData() {
+    saveData(jsonData);
+    print(jsonData.toJson().toString());
   }
 }
