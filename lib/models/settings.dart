@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:esys_flutter_share/esys_flutter_share.dart';
 
 Map<String, dynamic> jsonTemplateSettings = {
   "currentCompetition" : "Ryerson"
@@ -33,12 +36,20 @@ void checkSettingsFile() async {
   }
 }
 
-void saveSettings(String value) async {
+void shareSettings() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
   String settingsPath = appDocPath + "/settings.json";
 
-  print("Save settings");
+  Uint8List bytes1 = await File(settingsPath).readAsBytes();
+
+  await Share.file("Share Match Data", "Settings", bytes1, '*/*');
+}
+
+void saveSettings(String value) async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  String appDocPath = appDocDir.path;
+  String settingsPath = appDocPath + "/settings.json";
 
   Map<String, dynamic> currentSettings = await getSettings();
   Settings newSettings = Settings.fromJson(currentSettings);

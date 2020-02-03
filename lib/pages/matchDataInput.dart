@@ -34,8 +34,8 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
       appBar: AppBar(
         title: Text("6854 Dynamic Scouting App", style: TextStyle(
           color: Constants.darkPrimary,
-          fontSize: 25,
-          fontWeight: FontWeight.w500,
+          fontSize: 20,
+          fontWeight: FontWeight.w300,
           fontFamily: 'Aileron'
         )),
         backgroundColor: Constants.lightPrimary,
@@ -43,7 +43,7 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.check),
-        onPressed: () => _showDialog(),
+        onPressed: () => showSaveDialog(),
       ),
       body: Center(
         child: Container(
@@ -119,7 +119,7 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     jsonData.items[index].value = value;
   }
 
-  void _showDialog() async {
+  void showSaveDialog() async {
     Map<String, dynamic> settings = await getSettings();
     jsonData.match.competition = Settings.fromJson(settings).currentCompetition;
 
@@ -127,24 +127,24 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        shareSettings();
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Warning", style: TextStyle(color: Constants.darkBG)),
           content: new Text("Are you sure you want to continue?", style: TextStyle(color: Constants.darkBG)),
           actions: <Widget>[
             new FlatButton(
+              child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
               child: new Text("SAVE", style: TextStyle(color: Constants.darkBG)),
               onPressed: () {
                 printData();
                 Navigator.of(context).pop();
               }
-            ),
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
             ),
           ],
           backgroundColor: Constants.darkAccent,

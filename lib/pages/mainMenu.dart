@@ -3,6 +3,7 @@ import 'package:viking_scouter/models/items.dart';
 import 'package:viking_scouter/pages/matchDataInput.dart';
 import 'package:viking_scouter/util/constants.dart';
 import 'package:viking_scouter/models/settings.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 var currentCompetitionValue;
 List<JSONData> dataLists = new List<JSONData>();
@@ -108,16 +109,18 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void setup() async {
+    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+    PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
+
+    if (permission != PermissionStatus.granted) {
+      bool isOpened = await PermissionHandler().openAppSettings();
+    }
+
     createMatchesFolder();
     checkSettingsFile();
     await loadDataLists();
     Map<String, dynamic> settings = await getSettings();
     currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
-    currentCompetitionValue.addListener(updatedCompetition);
-  }
-
-  void updatedCompetition() {
-    saveSettings(currentCompetitionValue.text);
   }
 
   void _showDialog() async {
@@ -150,6 +153,9 @@ class _MainMenuPageState extends State<MainMenuPage> {
                 style: TextStyle(
                   color: Constants.darkBG
                 ),
+                onChanged: (text) {
+                  saveSettings(text);
+                },
                 cursorColor: Constants.darkBG,
               ),
             )
