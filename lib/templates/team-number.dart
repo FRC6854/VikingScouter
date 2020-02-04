@@ -32,7 +32,7 @@ Widget teamNumberWidget (String name, int value,  Function onChange) {
               )
           ),
           keyboardType: TextInputType.number,
-          onSubmitted: (number) => onChange(int.parse(number)),
+          onChanged: (number) => onChange(int.parse(number)),
         ),
         Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
       ],

@@ -32,7 +32,7 @@ Widget numberWidget (String name, int value, int index, Function onChange) {
             )
           ),
           keyboardType: TextInputType.number,
-          onSubmitted: (number) => onChange(index, int.parse(number)),
+          onChanged: (number) => onChange(index, int.parse(number)),
         ),
         Padding(padding: EdgeInsets.only(top: 5, bottom: 5)),
       ],
