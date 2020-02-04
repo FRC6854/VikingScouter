@@ -1,26 +1,31 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:esys_flutter_share/esys_flutter_share.dart';
 
 Map<String, dynamic> jsonTemplateSettings = {
-  "currentCompetition" : "Ryerson"
+  "currentCompetition" : "Ryerson",
+  "scoutID" : 212
 };
+
+String lastCurrentCompetition;
+int lastScoutID;
 
 class Settings {
   String currentCompetition;
+  int scoutID;
 
-  Settings({this.currentCompetition});
+  Settings({this.currentCompetition, this.scoutID});
 
   Settings.fromJson(Map<String, dynamic> json) {
     currentCompetition = json['currentCompetition'];
+    scoutID = json['scoutID'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['currentCompetition'] = this.currentCompetition;
+    data['scoutID'] = this.scoutID;
     return data;
   }
 }
@@ -36,24 +41,24 @@ void checkSettingsFile() async {
   }
 }
 
-void shareSettings() async {
-  Directory appDocDir = await getApplicationDocumentsDirectory();
-  String appDocPath = appDocDir.path;
-  String settingsPath = appDocPath + "/settings.json";
-
-  Uint8List bytes1 = await File(settingsPath).readAsBytes();
-
-  await Share.file("Share Match Data", "Settings", bytes1, '*/*');
+void updateSettingsCurrentCompetition(String value) {
+  lastCurrentCompetition = value;
 }
 
-void saveSettings(String value) async {
+void updateSettingsScoutID(int value) {
+  lastScoutID = value;
+}
+
+void saveSettings() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
   String settingsPath = appDocPath + "/settings.json";
 
   Map<String, dynamic> currentSettings = await getSettings();
   Settings newSettings = Settings.fromJson(currentSettings);
-  newSettings.currentCompetition = value;
+  print(newSettings.scoutID);
+  newSettings.currentCompetition = lastCurrentCompetition;
+  newSettings.scoutID = lastScoutID;
   new File(settingsPath).writeAsString(json.encode(newSettings.toJson()));
 }
 

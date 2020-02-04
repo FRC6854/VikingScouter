@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import 'package:viking_scouter/models/settings.dart';
+import 'package:share_extend/share_extend.dart';
 
 Map<String, dynamic> jsonTemplateItems = {
   "match": {
@@ -191,8 +193,10 @@ void saveData(JSONData data) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
 
+  Settings settings = Settings.fromJson(await getSettings());
+
   // e.g. /matches/Western-33-6854.json
-  String settingsPath = appDocPath + "/matches/" + data.match.competition + "-" + data.match.matchNumber.toString() + "-" + data.match.teamNumber.toString() + ".json";
+  String settingsPath = appDocPath + "/matches/" + data.match.competition + "-" + data.match.matchNumber.toString() + "-" + data.match.teamNumber.toString() + "-" + settings.scoutID.toString() + ".json";
 
   new File(settingsPath).writeAsString(json.encode(data.toJson()));
 }
@@ -210,4 +214,30 @@ Future<List<Map<String, dynamic>>> getDataLists() async {
   }
 
   return dataLists;
+}
+
+void shareFileFromIndex(int index) async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+
+  for (int i = 0; i < matchesDir.listSync().length; i++) {
+    if (i == index) {
+      String path = matchesDir.listSync()[i].path;
+      print(path);
+      ShareExtend.share(path, "file");
+    }
+  }
+}
+
+Future getDataListFiles() async {
+  List<String> files = new List<String>();
+
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+
+  for (File file in matchesDir.listSync()) {
+    files.add(file.path);
+  }
+
+  return files;
 }

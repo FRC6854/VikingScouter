@@ -12,6 +12,7 @@ import 'package:viking_scouter/templates/match-number.dart';
 import 'package:viking_scouter/templates/team-number.dart';
 
 JSONData jsonData = JSONData.fromJson(jsonTemplateItems);
+BuildContext mainContext;
 
 class MatchDataInputPage extends StatefulWidget {
   MatchDataInputPage(JSONData data) {
@@ -30,15 +31,16 @@ class MatchDataInputPage extends StatefulWidget {
 class _MatchDataInputPageState extends State<MatchDataInputPage> {
   @override
   Widget build(BuildContext context) {
+    mainContext = context;
     return Scaffold(
       appBar: AppBar(
         title: Text("6854 Dynamic Scouting App", style: TextStyle(
-          color: Constants.darkPrimary,
-          fontSize: 20,
-          fontWeight: FontWeight.w300,
-          fontFamily: 'Aileron'
+            color: Constants.lightPrimary,
+            fontSize: 20,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Aileron'
         )),
-        backgroundColor: Constants.lightPrimary,
+        backgroundColor: Constants.darkPrimary,
         centerTitle: true,
       ),
       floatingActionButton: FloatingActionButton(
@@ -127,7 +129,6 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        shareSettings();
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Warning", style: TextStyle(color: Constants.darkBG)),
@@ -144,6 +145,7 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
               onPressed: () {
                 printData();
                 Navigator.of(context).pop();
+                Navigator.of(mainContext).pop();
               }
             ),
           ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_extend/share_extend.dart';
 import 'package:viking_scouter/models/items.dart';
 import 'package:viking_scouter/pages/matchDataInput.dart';
 import 'package:viking_scouter/util/constants.dart';
@@ -6,6 +7,7 @@ import 'package:viking_scouter/models/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 var currentCompetitionValue;
+var currentScoutIDValue;
 List<JSONData> dataLists = new List<JSONData>();
 
 class MainMenuPage extends StatefulWidget {
@@ -15,48 +17,197 @@ class MainMenuPage extends StatefulWidget {
 
 class _MainMenuPageState extends State<MainMenuPage> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+
     setup();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    update();
     return Scaffold(
         appBar: AppBar(
           title: Text("6854 Dynamic Scouting App", style: TextStyle(
-              color: Constants.darkPrimary,
-              fontSize: 25,
+              color: Constants.lightPrimary,
+              fontSize: 20,
               fontWeight: FontWeight.w500,
               fontFamily: 'Aileron'
           )),
-          backgroundColor: Constants.lightPrimary,
+          backgroundColor: Constants.darkPrimary,
           centerTitle: true,
         ),
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: Text(
+                    'Settings',
+                    style: TextStyle(
+                        color: Constants.lightPrimary,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'Aileron'
+                    )
+                ),
+                decoration: BoxDecoration(
+                  color: Constants.darkBG,
+                ),
+              ),
+              ExpansionTile(
+                title: Text("Current Competition"),
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(left: 20, bottom: 20, right: 20),
+                    child: TextField(
+                      controller: currentCompetitionValue,
+                      decoration: new InputDecoration(
+                          hintText: "e.g. Western",
+                          labelStyle: TextStyle(
+                              color: Constants.lightPrimary
+                          ),
+                          hintStyle: TextStyle(
+                              color: Constants.lightPrimary
+                          ),
+                          border: UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                  width: 1,
+                                  style: BorderStyle.none
+                              )
+                          )
+                      ),
+                      style: TextStyle(
+                          color: Constants.lightPrimary
+                      ),
+                      onChanged: (text) {
+                        updateSettingsCurrentCompetition(text);
+                        saveSettings();
+                      },
+                      cursorColor: Constants.lightPrimary,
+                    )
+                  )
+                ]
+              ),
+              ExpansionTile(
+                  title: Text("Scout ID"),
+                  children: <Widget>[
+                    Padding(
+                        padding: EdgeInsets.only(left: 20, bottom: 20, right: 20),
+                        child: TextField(
+                          controller: currentScoutIDValue,
+                          decoration: new InputDecoration(
+                              hintText: "e.g. 21",
+                              labelStyle: TextStyle(
+                                  color: Constants.lightPrimary
+                              ),
+                              hintStyle: TextStyle(
+                                  color: Constants.lightPrimary
+                              ),
+                              border: UnderlineInputBorder(
+                                  borderSide: BorderSide(
+                                      width: 1,
+                                      style: BorderStyle.none
+                                  )
+                              )
+                          ),
+                          keyboardType: TextInputType.number,
+                          style: TextStyle(
+                              color: Constants.lightPrimary
+                          ),
+                          onChanged: (value) {
+                            updateSettingsScoutID(int.parse(value));
+                            saveSettings();
+                          },
+                          cursorColor: Constants.lightPrimary,
+                        )
+                    )
+                  ]
+              ),
+              ListTile(
+                title: Text("Share All Match Data"),
+                onTap: () {
+                  shareAll();
+                },
+              ),
+            ],
+          )
+        ),
         floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.settings),
-          onPressed: () => _showDialog(),
+          child: Icon(Icons.add),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MatchDataInputPage(null)),
+          )
         ),
         body: Center(
           child: Container(
               child: Column(
                 children: <Widget>[
-                  listOfDataWidget(),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                  ),
-                  RaisedButton(
-                    child: Text("New Match"),
-                    color: Constants.lightPrimary,
-                    textColor: Constants.darkBG,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MatchDataInputPage(null)),
-                      );
-                    },
-                  ),
-                  Padding(
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
-                  )
+                  listOfDataWidget()
                 ],
               )
           ),
+        )
+    );
+  }
+
+  Widget listOfDataWidget() {
+    if (dataLists.length == 0) {
+      return Padding(
+        padding: EdgeInsets.only(top: 30),
+        child: Text(
+          "No Match Data Yet...",
+          style: TextStyle(
+              color: Constants.lightPrimary,
+              fontSize: 15,
+              fontWeight: FontWeight.w300,
+              fontFamily: 'Aileron'
+          ),
+        ),
+      );
+    }
+    return Expanded(
+        child: Container(
+            child: Padding(
+              padding: EdgeInsets.all(5),
+              child: ListView.builder(
+                  itemCount: dataLists.length,
+                  itemBuilder: (context, index) {
+                    JSONData currentDataList = dataLists[index];
+                    return Card(
+                      child: Column(
+                        children: <Widget>[
+                          ListTile(
+                            leading: Icon(Icons.flag),
+                            title: Text(currentDataList.match.competition.toString() + " - " + currentDataList.match.matchNumber.toString()),
+                            subtitle: Text("Team Number - " + currentDataList.match.teamNumber.toString()),
+                          ),
+                          ButtonBar(
+                            children: <Widget>[
+                              FlatButton(
+                                child: const Text('SHARE'),
+                                onPressed: () {
+                                  shareFileFromIndex(index);
+                                },
+                              ),
+                              FlatButton(
+                                child: const Text('EDIT'),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => MatchDataInputPage(currentDataList)),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+              ),
+            )
         )
     );
   }
@@ -71,121 +222,37 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
   }
 
-  Widget listOfDataWidget() {
-    return Expanded(
-        child: Container(
-            child: ListView.builder(
-                itemCount: dataLists.length,
-                itemBuilder: (context, index) {
-                  JSONData currentDataList = dataLists[index];
-                  return Card(
-                      child: Column(
-                        children: <Widget>[
-                          ListTile(
-                            leading: Icon(Icons.flag),
-                            title: Text(currentDataList.match.competition.toString() + " - " + currentDataList.match.matchNumber.toString()),
-                            subtitle: Text("Team Number - " + currentDataList.match.teamNumber.toString()),
-                          ),
-                          ButtonBar(
-                            children: <Widget>[
-                              FlatButton(
-                                child: const Text('EDIT'),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => MatchDataInputPage(currentDataList)),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                  );
-                }
-            )
-        )
-    );
+  void shareAll() async {
+    List<String> shares = await getDataListFiles();
+
+    if (shares.length == 0) {
+      return;
+    }
+
+    ShareExtend.shareMultiple(shares, "file");
+  }
+
+  void update() async {
+    await loadDataLists();
   }
 
   void setup() async {
-    await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
 
     if (permission != PermissionStatus.granted) {
-      bool isOpened = await PermissionHandler().openAppSettings();
+      await PermissionHandler().openAppSettings();
+    }
+    else {
+      await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
 
     createMatchesFolder();
     checkSettingsFile();
+
     await loadDataLists();
     Map<String, dynamic> settings = await getSettings();
-    currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
-  }
 
-  void _showDialog() async {
-    await showDialog<String>(
-      context: context,
-      // ignore: deprecated_member_use
-      child: new AlertDialog(
-        content: new Row(
-          children: <Widget>[
-            new Expanded(
-              child: new TextField(
-                autofocus: true,
-                controller: currentCompetitionValue,
-                decoration: new InputDecoration(
-                  labelText: "Enter current competition",
-                  hintText: "e.g. Western",
-                  labelStyle: TextStyle(
-                      color: Constants.darkBG
-                  ),
-                  hintStyle: TextStyle(
-                      color: Constants.darkPrimary
-                  ),
-                  border: UnderlineInputBorder(
-                      borderSide: BorderSide(
-                          width: 1,
-                          style: BorderStyle.none
-                      )
-                  )
-                ),
-                style: TextStyle(
-                  color: Constants.darkBG
-                ),
-                onChanged: (text) {
-                  saveSettings(text);
-                },
-                cursorColor: Constants.darkBG,
-              ),
-            )
-          ],
-        ),
-        actions: <Widget>[
-          new FlatButton(
-              child: new Text(
-                'CANCEL',
-                style: TextStyle(
-                    color: Constants.darkBG
-                )
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              }),
-          new FlatButton(
-            child: new Text(
-                'SAVE',
-                style: TextStyle(
-                    color: Constants.darkBG
-                )
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            }
-          )
-        ],
-        backgroundColor: Constants.darkAccent,
-      ),
-    );
+    currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
+    currentScoutIDValue = new TextEditingController(text: Settings.fromJson(settings).scoutID.toString());
   }
 }
