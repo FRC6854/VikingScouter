@@ -1,4 +1,4 @@
-package com.example.viking_scouter
+package com.team6854.viking_scouter
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.android.FlutterActivity

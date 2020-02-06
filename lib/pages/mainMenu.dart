@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:viking_scouter/models/items.dart';
+import 'package:viking_scouter/pages/bluetooth.dart';
 import 'package:viking_scouter/pages/matchDataInput.dart';
 import 'package:viking_scouter/util/constants.dart';
 import 'package:viking_scouter/models/settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-var currentCompetitionValue;
-var currentScoutIDValue;
+TextEditingController currentCompetitionValue;
+TextEditingController currentScoutIDValue;
+String currentBluetoothDevice = "Nothing Right Now";
+
 List<JSONData> dataLists = new List<JSONData>();
 
 class MainMenuPage extends StatefulWidget {
@@ -130,6 +133,15 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   shareAll();
                 },
               ),
+              ListTile(
+                title: Text("Bluetooth"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BluetoothPage()),
+                  );
+                },
+              ),
             ],
           )
         ),
@@ -144,7 +156,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
           child: Container(
               child: Column(
                 children: <Widget>[
-                  listOfDataWidget()
+                  listOfDataWidget(),
+                  Text(currentBluetoothDevice)
                 ],
               )
           ),
@@ -240,9 +253,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
     PermissionStatus permission = await PermissionHandler().checkPermissionStatus(PermissionGroup.storage);
 
     if (permission != PermissionStatus.granted) {
-      await PermissionHandler().openAppSettings();
-    }
-    else {
       await PermissionHandler().requestPermissions([PermissionGroup.storage]);
     }
 
@@ -254,5 +264,6 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
     currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
     currentScoutIDValue = new TextEditingController(text: Settings.fromJson(settings).scoutID.toString());
+    currentBluetoothDevice = Settings.fromJson(settings).bluetoothDevice;
   }
 }

@@ -5,27 +5,32 @@ import 'package:path_provider/path_provider.dart';
 
 Map<String, dynamic> jsonTemplateSettings = {
   "currentCompetition" : "Ryerson",
-  "scoutID" : 212
+  "scoutID" : 212,
+  "bluetoothDevice" : ""
 };
 
 String lastCurrentCompetition;
 int lastScoutID;
+String lastBluetoothDevice;
 
 class Settings {
   String currentCompetition;
   int scoutID;
+  String bluetoothDevice;
 
-  Settings({this.currentCompetition, this.scoutID});
+  Settings({this.currentCompetition, this.scoutID, this.bluetoothDevice});
 
   Settings.fromJson(Map<String, dynamic> json) {
     currentCompetition = json['currentCompetition'];
     scoutID = json['scoutID'];
+    bluetoothDevice = json['bluetoothDevice'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['currentCompetition'] = this.currentCompetition;
     data['scoutID'] = this.scoutID;
+    data['bluetoothDevice'] = this.bluetoothDevice;
     return data;
   }
 }
@@ -49,6 +54,10 @@ void updateSettingsScoutID(int value) {
   lastScoutID = value;
 }
 
+void updateBluetoothDevice(String value) {
+  lastBluetoothDevice = value;
+}
+
 void saveSettings() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
@@ -59,6 +68,7 @@ void saveSettings() async {
   print(newSettings.scoutID);
   newSettings.currentCompetition = lastCurrentCompetition;
   newSettings.scoutID = lastScoutID;
+  newSettings.bluetoothDevice = lastBluetoothDevice;
   new File(settingsPath).writeAsString(json.encode(newSettings.toJson()));
 }
 
