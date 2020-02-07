@@ -1,8 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:viking_scouter/models/settings.dart';
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:share_extend/share_extend.dart';
+import 'package:viking_scouter/util/constants.dart';
 
 Map<String, dynamic> jsonTemplateItems = {
   "match": {
@@ -186,7 +189,7 @@ void createMatchesFolder() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
 
-  new Directory(appDocPath + "/matches/").create(recursive: true);
+  await new Directory(appDocPath + "/matches/").create(recursive: true);
 }
 
 void saveData(JSONData data) async {
@@ -195,11 +198,15 @@ void saveData(JSONData data) async {
 
   Settings settings = Settings.fromJson(await getSettings());
 
-  // e.g. /matches/Western-33-6854.json
+  // e.g. /matches/Western-33-6854-22.json
   String settingsPath = appDocPath + "/matches/" + data.match.competition + "-" + data.match.matchNumber.toString() + "-" + data.match.teamNumber.toString() + "-" + settings.scoutID.toString() + ".json";
 
   new File(settingsPath).writeAsString(json.encode(data.toJson()));
 }
+
+/*
+  Fetch data for main menu
+ */
 
 Future<List<Map<String, dynamic>>> getDataLists() async {
   List<Map<String, dynamic>> dataLists = new List<Map<String, dynamic>>();
@@ -216,6 +223,10 @@ Future<List<Map<String, dynamic>>> getDataLists() async {
   return dataLists;
 }
 
+/*
+  SHARE FILES
+ */
+
 void shareFileFromIndex(int index) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   Directory matchesDir = new Directory(appDocDir.path + "/matches/");
@@ -223,7 +234,9 @@ void shareFileFromIndex(int index) async {
   for (int i = 0; i < matchesDir.listSync().length; i++) {
     if (i == index) {
       String path = matchesDir.listSync()[i].path;
+
       print(path);
+
       ShareExtend.share(path, "file");
     }
   }
@@ -240,4 +253,154 @@ Future getDataListFiles() async {
   }
 
   return files;
+}
+
+/*
+  BLUETOOTH SERIAL FILE SENDING
+ */
+
+void sendAllFiles(BuildContext context) async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+  Settings settings = Settings.fromJson(await getSettings());
+
+  try {
+    BluetoothConnection connection = await BluetoothConnection.toAddress(settings.bluetoothDevice);
+    print('Connected to the device');
+
+    for (int i = 0; i < matchesDir.listSync().length; i++) {
+      String path = matchesDir.listSync()[i].path;
+      connection.output.add(new File(path).readAsBytesSync());
+    }
+
+    print('Done sending files');
+
+    connection.dispose();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Success", style: TextStyle(color: Constants.darkBG)),
+          content: new Text("Successfully send the data to the Bluetooth Hub", style: TextStyle(color: Constants.darkBG)),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+          backgroundColor: Constants.darkAccent,
+        );
+      },
+    );
+  }
+  catch (exception) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Error", style: TextStyle(color: Constants.darkBG)),
+          content: new Text("Cannot connect, exception occured", style: TextStyle(color: Constants.darkBG)),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            new FlatButton(
+              child: new Text("RETRY", style: TextStyle(color: Constants.darkBG)),
+              onPressed: () {
+                Navigator.of(context).pop();
+                sendAllFiles(context);
+              },
+            ),
+          ],
+          backgroundColor: Constants.darkAccent,
+        );
+      },
+    );
+    print(exception);
+    print('Cannot connect, exception occured');
+  }
+}
+
+void sendFileFromIndex(int index, BuildContext context) async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+
+  for (int i = 0; i < matchesDir.listSync().length; i++) {
+    if (i == index) {
+      Settings settings = Settings.fromJson(await getSettings());
+      String path = matchesDir.listSync()[i].path;
+
+      print(path);
+      print(settings.bluetoothDevice);
+
+      try {
+        BluetoothConnection connection = await BluetoothConnection.toAddress(settings.bluetoothDevice);
+        print('Connected to the device');
+
+        connection.output.add(new File(path).readAsBytesSync());
+
+        print('Done sending file');
+
+        connection.dispose();
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              title: new Text("Success", style: TextStyle(color: Constants.darkBG)),
+              content: new Text("Successfully send the data to the Bluetooth Hub", style: TextStyle(color: Constants.darkBG)),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+              backgroundColor: Constants.darkAccent,
+            );
+          },
+        );
+      }
+      catch (exception) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            // return object of type Dialog
+            return AlertDialog(
+              title: new Text("Error", style: TextStyle(color: Constants.darkBG)),
+              content: new Text("Cannot connect, exception occured", style: TextStyle(color: Constants.darkBG)),
+              actions: <Widget>[
+                new FlatButton(
+                  child: new Text("CLOSE", style: TextStyle(color: Constants.darkBG)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                new FlatButton(
+                  child: new Text("RETRY", style: TextStyle(color: Constants.darkBG)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    sendAllFiles(context);
+                  },
+                ),
+              ],
+              backgroundColor: Constants.darkAccent,
+            );
+          },
+        );
+        print(exception);
+        print('Cannot connect, exception occured');
+      }
+    }
+  }
 }

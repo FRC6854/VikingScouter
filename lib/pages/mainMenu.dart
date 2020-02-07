@@ -9,7 +9,6 @@ import 'package:permission_handler/permission_handler.dart';
 
 TextEditingController currentCompetitionValue;
 TextEditingController currentScoutIDValue;
-String currentBluetoothDevice = "Nothing Right Now";
 
 List<JSONData> dataLists = new List<JSONData>();
 
@@ -127,19 +126,30 @@ class _MainMenuPageState extends State<MainMenuPage> {
                     )
                   ]
               ),
+              ExpansionTile(
+                title: Text("Bluetooth Settings"),
+                children: <Widget>[
+                  ListTile(
+                    title: Text("Send All Match Data"),
+                    onTap: () {
+                      sendAllFiles(context);
+                    },
+                  ),
+                  ListTile(
+                    title: Text("Bluetooth"),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BluetoothPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
               ListTile(
                 title: Text("Share All Match Data"),
                 onTap: () {
                   shareAll();
-                },
-              ),
-              ListTile(
-                title: Text("Bluetooth"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => BluetoothPage()),
-                  );
                 },
               ),
             ],
@@ -156,8 +166,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
           child: Container(
               child: Column(
                 children: <Widget>[
-                  listOfDataWidget(),
-                  Text(currentBluetoothDevice)
+                  listOfDataWidget()
                 ],
               )
           ),
@@ -205,6 +214,12 @@ class _MainMenuPageState extends State<MainMenuPage> {
                                 },
                               ),
                               FlatButton(
+                                child: const Text('SEND'),
+                                onPressed: () {
+                                  sendFileFromIndex(index, context);
+                                },
+                              ),
+                              FlatButton(
                                 child: const Text('EDIT'),
                                 onPressed: () {
                                   Navigator.push(
@@ -247,6 +262,25 @@ class _MainMenuPageState extends State<MainMenuPage> {
 
   void update() async {
     await loadDataLists();
+
+    Map<String, dynamic> settings = await getSettings();
+
+    String newValueCurrentCompetition = Settings.fromJson(settings).currentCompetition;
+    String newValueScoutID = Settings.fromJson(settings).scoutID.toString();
+
+    currentCompetitionValue.value = TextEditingValue(
+      text: newValueCurrentCompetition,
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: newValueCurrentCompetition.length),
+      ),
+    );
+
+    currentScoutIDValue.value = TextEditingValue(
+      text: newValueScoutID,
+      selection: TextSelection.fromPosition(
+        TextPosition(offset: newValueScoutID.length),
+      ),
+    );
   }
 
   void setup() async {
@@ -262,8 +296,8 @@ class _MainMenuPageState extends State<MainMenuPage> {
     await loadDataLists();
     Map<String, dynamic> settings = await getSettings();
 
+    print("Setup");
     currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
     currentScoutIDValue = new TextEditingController(text: Settings.fromJson(settings).scoutID.toString());
-    currentBluetoothDevice = Settings.fromJson(settings).bluetoothDevice;
   }
 }

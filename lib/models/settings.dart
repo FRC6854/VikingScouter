@@ -6,7 +6,8 @@ import 'package:path_provider/path_provider.dart';
 Map<String, dynamic> jsonTemplateSettings = {
   "currentCompetition" : "Ryerson",
   "scoutID" : 212,
-  "bluetoothDevice" : ""
+  "bluetoothDevice" : "",
+  "usingBluetooth" : false
 };
 
 String lastCurrentCompetition;
@@ -42,7 +43,7 @@ void checkSettingsFile() async {
 
   if (FileSystemEntity.typeSync(settingsPath) == FileSystemEntityType.notFound) {
     print("Not found");
-    new File(settingsPath).writeAsString(json.encode(jsonTemplateSettings));
+    await File(settingsPath).writeAsString(json.encode(jsonTemplateSettings));
   }
 }
 
