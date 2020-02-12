@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:share_extend/share_extend.dart';
+
 import 'package:viking_scouter/models/items.dart';
 import 'package:viking_scouter/pages/bluetooth.dart';
 import 'package:viking_scouter/pages/matchDataInput.dart';
 import 'package:viking_scouter/util/constants.dart';
 import 'package:viking_scouter/models/settings.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 
 TextEditingController currentCompetitionValue;
@@ -294,10 +296,5 @@ class _MainMenuPageState extends State<MainMenuPage> {
     checkSettingsFile();
 
     await loadDataLists();
-    Map<String, dynamic> settings = await getSettings();
-
-    print("Setup");
-    currentCompetitionValue = new TextEditingController(text: Settings.fromJson(settings).currentCompetition);
-    currentScoutIDValue = new TextEditingController(text: Settings.fromJson(settings).scoutID.toString());
   }
 }
