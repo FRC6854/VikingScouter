@@ -189,7 +189,10 @@ void createMatchesFolder() async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
 
-  await new Directory(appDocPath + "/matches/").create(recursive: true);
+  Directory matchesDir = new Directory(appDocPath + "/matches/");
+  if (await matchesDir.exists() == false) {
+    await matchesDir.create(recursive: true);
+  }
 }
 
 void saveData(JSONData data) async {
