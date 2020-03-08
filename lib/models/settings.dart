@@ -70,6 +70,7 @@ void saveSettings() async {
   newSettings.currentCompetition = lastCurrentCompetition;
   newSettings.scoutID = lastScoutID;
   newSettings.bluetoothDevice = lastBluetoothDevice;
+
   new File(settingsPath).writeAsString(json.encode(newSettings.toJson()));
 }
 

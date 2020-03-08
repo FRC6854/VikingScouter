@@ -9,8 +9,8 @@ import 'package:viking_scouter/models/settings.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 
-TextEditingController currentCompetitionValue;
-TextEditingController currentScoutIDValue;
+TextEditingController currentCompetitionValue = new TextEditingController();
+TextEditingController currentScoutIDValue = new TextEditingController();
 
 List<JSONData> dataLists = new List<JSONData>();
 
