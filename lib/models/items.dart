@@ -6,6 +6,7 @@ import 'package:viking_scouter/models/settings.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:share_extend/share_extend.dart';
 import 'package:viking_scouter/util/constants.dart';
+import 'package:viking_scouter/models/tableau_output.dart';
 
 Map<String, dynamic> jsonTemplateItems = {
   "match": {
@@ -238,9 +239,33 @@ void shareFileFromIndex(int index) async {
     if (i == index) {
       String path = matchesDir.listSync()[i].path;
 
-      print(path);
+      String pathContents = await new File(path).readAsString();
 
-      ShareExtend.share(path, "file");
+      JSONData matchData = JSONData.fromJson(json.decode(pathContents));
+      Settings settings = Settings.fromJson(await getSettings());
+
+      Map<String, dynamic> tableauData = {
+        "team": 254,
+        "match": 22,
+        "scout": 1,
+        "time": 1583716305,
+        "metrics": [
+          {
+            "data": 1
+          }
+        ]
+      };
+
+      TableauOutput tableauOutputFile = new TableauOutput.fromJson(tableauData);
+      tableauOutputFile.team = matchData.match.teamNumber;
+      tableauOutputFile.match = matchData.match.matchNumber;
+      tableauOutputFile.scout = settings.scoutID;
+      tableauOutputFile.time = new DateTime.now().millisecondsSinceEpoch;
+
+      tableauOutputFile.metrics.add( {"Table": 1} );
+
+      ShareExtend.share(tableauOutputFile.toJson().toString(), "text");
+      //ShareExtend.share(path, "file");
     }
   }
 }
