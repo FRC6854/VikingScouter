@@ -134,7 +134,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                   ListTile(
                     title: Text("Send All Match Data"),
                     onTap: () {
-                      sendAllFiles(context);
+                      sendAllTableauFiles(context);
                     },
                   ),
                   ListTile(
@@ -218,7 +218,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
                               FlatButton(
                                 child: const Text('SEND'),
                                 onPressed: () {
-                                  sendFileFromIndex(index, context);
+                                  sendTableauFileFromIndex(index, context);
                                 },
                               ),
                               FlatButton(
@@ -253,13 +253,13 @@ class _MainMenuPageState extends State<MainMenuPage> {
   }
 
   void shareAll() async {
-    List<String> shares = await getDataListFiles();
+    List<String> shares = await getTableauDataFiles();
 
     if (shares.length == 0) {
       return;
     }
 
-    ShareExtend.shareMultiple(shares, "file");
+    ShareExtend.shareMultiple(shares, "files");
   }
 
   void update() async {
@@ -293,6 +293,7 @@ class _MainMenuPageState extends State<MainMenuPage> {
     }
 
     createMatchesFolder();
+    createTableauFolder();
     checkSettingsFile();
 
     await loadDataLists();

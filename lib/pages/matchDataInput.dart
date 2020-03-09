@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:viking_scouter/models/settings.dart';
+import 'package:viking_scouter/models/tableau_output.dart';
 import 'package:viking_scouter/util/constants.dart';
 import 'package:viking_scouter/models/items.dart';
 import 'package:viking_scouter/templates/counter.dart';
@@ -143,7 +146,7 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
             new FlatButton(
               child: new Text("SAVE", style: TextStyle(color: Constants.darkBG)),
               onPressed: () {
-                printData();
+                saveDataToFiles();
                 Navigator.of(context).pop();
                 Navigator.of(mainContext).pop();
               }
@@ -155,8 +158,27 @@ class _MatchDataInputPageState extends State<MatchDataInputPage> {
     );
   }
 
-  void printData() {
+  void saveDataToFiles() async {
     saveData(jsonData);
-    print(jsonData.toJson().toString());
+
+    Settings settings = Settings.fromJson(await getSettings());
+
+    TableauOutput tableauOutputFile = new TableauOutput();
+    tableauOutputFile.team = jsonData.match.teamNumber;
+    tableauOutputFile.match = jsonData.match.matchNumber;
+    tableauOutputFile.scout = settings.scoutID;
+    tableauOutputFile.time = new DateTime.now().millisecondsSinceEpoch;
+    tableauOutputFile.metrics = new Metrics();
+    tableauOutputFile.metrics.values = new Map<String, dynamic>();
+
+    Map<String, dynamic> matchDataItems = new Map<String, dynamic>();
+    for (int i = 0; i < jsonData.items.length; i++) {
+      if (jsonData.items[i].type != "header") {
+        matchDataItems[jsonData.items[i].name] = jsonData.items[i].value;
+      }
+    }
+    tableauOutputFile.metrics.values = matchDataItems;
+
+    saveTableauData(tableauOutputFile);
   }
 }

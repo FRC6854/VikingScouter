@@ -196,6 +196,16 @@ void createMatchesFolder() async {
   }
 }
 
+void createTableauFolder() async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  String appDocPath = appDocDir.path;
+
+  Directory matchesDir = new Directory(appDocPath + "/tableau/");
+  if (await matchesDir.exists() == false) {
+    await matchesDir.create(recursive: true);
+  }
+}
+
 void saveData(JSONData data) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
   String appDocPath = appDocDir.path;
@@ -203,9 +213,21 @@ void saveData(JSONData data) async {
   Settings settings = Settings.fromJson(await getSettings());
 
   // e.g. /matches/Western-33-6854-22.json
-  String settingsPath = appDocPath + "/matches/" + data.match.competition + "-" + data.match.matchNumber.toString() + "-" + data.match.teamNumber.toString() + "-" + settings.scoutID.toString() + ".json";
+  String dataPath = appDocPath + "/matches/" + data.match.competition + "-" + data.match.matchNumber.toString() + "-" + data.match.teamNumber.toString() + "-" + settings.scoutID.toString() + ".json";
 
-  new File(settingsPath).writeAsString(json.encode(data.toJson()));
+  new File(dataPath).writeAsString(json.encode(data.toJson()));
+}
+
+void saveTableauData(TableauOutput data) async {
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  String appDocPath = appDocDir.path;
+
+  Settings settings = Settings.fromJson(await getSettings());
+
+  // e.g. /matches/Western-33-6854-22.json
+  String tableauPath = appDocPath + "/tableau/" + settings.currentCompetition + "-" + data.match.toString() + "-" + data.team.toString() + "-" + data.scout.toString() + ".json";
+
+  new File(tableauPath).writeAsString(json.encode(data.toJson()));
 }
 
 /*
@@ -244,28 +266,23 @@ void shareFileFromIndex(int index) async {
       JSONData matchData = JSONData.fromJson(json.decode(pathContents));
       Settings settings = Settings.fromJson(await getSettings());
 
-      Map<String, dynamic> tableauData = {
-        "team": 254,
-        "match": 22,
-        "scout": 1,
-        "time": 1583716305,
-        "metrics": [
-          {
-            "data": 1
-          }
-        ]
-      };
-
-      TableauOutput tableauOutputFile = new TableauOutput.fromJson(tableauData);
+      TableauOutput tableauOutputFile = new TableauOutput();
       tableauOutputFile.team = matchData.match.teamNumber;
       tableauOutputFile.match = matchData.match.matchNumber;
       tableauOutputFile.scout = settings.scoutID;
       tableauOutputFile.time = new DateTime.now().millisecondsSinceEpoch;
+      tableauOutputFile.metrics = new Metrics();
+      tableauOutputFile.metrics.values = new Map<String, dynamic>();
 
-      tableauOutputFile.metrics.add( {"Table": 1} );
+      Map<String, dynamic> matchDataItems = new Map<String, dynamic>();
+      for (int i = 0; i < matchData.items.length; i++) {
+        if (matchData.items[i].type != "header" && matchData.items[i].type != "match-number" && matchData.items[i].type != "team-number") {
+          matchDataItems[matchData.items[i].name] = matchData.items[i].value;
+        }
+      }
+      tableauOutputFile.metrics.values = matchDataItems;
 
-      ShareExtend.share(tableauOutputFile.toJson().toString(), "text");
-      //ShareExtend.share(path, "file");
+      ShareExtend.share(json.encode(tableauOutputFile.toJson()), "text");
     }
   }
 }
@@ -283,21 +300,34 @@ Future getDataListFiles() async {
   return files;
 }
 
+Future getTableauDataFiles() async {
+  List<String> files = new List<String>();
+
+  Directory appDocDir = await getApplicationDocumentsDirectory();
+  Directory matchesDir = new Directory(appDocDir.path + "/tableau/");
+
+  for (File file in matchesDir.listSync()) {
+    files.add(file.path);
+  }
+
+  return files;
+}
+
 /*
   BLUETOOTH SERIAL FILE SENDING
  */
 
-void sendAllFiles(BuildContext context) async {
+void sendAllTableauFiles(BuildContext context) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
-  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+  Directory tableauDir = new Directory(appDocDir.path + "/tableau/");
   Settings settings = Settings.fromJson(await getSettings());
 
   try {
     BluetoothConnection connection = await BluetoothConnection.toAddress(settings.bluetoothDevice);
     print('Connected to the device');
 
-    for (int i = 0; i < matchesDir.listSync().length; i++) {
-      String path = matchesDir.listSync()[i].path;
+    for (int i = 0; i < tableauDir.listSync().length; i++) {
+      String path = tableauDir.listSync()[i].path;
       connection.output.add(new File(path).readAsBytesSync());
     }
 
@@ -344,7 +374,7 @@ void sendAllFiles(BuildContext context) async {
               child: new Text("RETRY", style: TextStyle(color: Constants.darkBG)),
               onPressed: () {
                 Navigator.of(context).pop();
-                sendAllFiles(context);
+                sendAllTableauFiles(context);
               },
             ),
           ],
@@ -357,14 +387,14 @@ void sendAllFiles(BuildContext context) async {
   }
 }
 
-void sendFileFromIndex(int index, BuildContext context) async {
+void sendTableauFileFromIndex(int index, BuildContext context) async {
   Directory appDocDir = await getApplicationDocumentsDirectory();
-  Directory matchesDir = new Directory(appDocDir.path + "/matches/");
+  Directory tableauDir = new Directory(appDocDir.path + "/tableau/");
 
-  for (int i = 0; i < matchesDir.listSync().length; i++) {
+  for (int i = 0; i < tableauDir.listSync().length; i++) {
     if (i == index) {
       Settings settings = Settings.fromJson(await getSettings());
-      String path = matchesDir.listSync()[i].path;
+      String path = tableauDir.listSync()[i].path;
 
       print(path);
       print(settings.bluetoothDevice);
@@ -418,7 +448,7 @@ void sendFileFromIndex(int index, BuildContext context) async {
                   child: new Text("RETRY", style: TextStyle(color: Constants.darkBG)),
                   onPressed: () {
                     Navigator.of(context).pop();
-                    sendAllFiles(context);
+                    sendAllTableauFiles(context);
                   },
                 ),
               ],
