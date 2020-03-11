@@ -42,12 +42,12 @@ Map<String, dynamic> jsonTemplateItems = {
       "value": false
     },
     {
-      "name": "High Goal",
+      "name": "Auto High Goal",
       "type": "counter",
       "value": 0
     },
     {
-      "name": "Low Goal",
+      "name": "Auto Low Goal",
       "type": "counter",
       "value": 0
     },
@@ -57,12 +57,12 @@ Map<String, dynamic> jsonTemplateItems = {
       "value": 0
     },
     {
-      "name": "High Goal",
+      "name": "Teleop High Goal",
       "type": "counter",
       "value": 0
     },
     {
-      "name": "Low Goal",
+      "name": "Teleop Low Goal",
       "type": "counter",
       "value": 0
     },
