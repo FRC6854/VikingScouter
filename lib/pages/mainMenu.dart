@@ -271,17 +271,11 @@ class _MainMenuPageState extends State<MainMenuPage> {
     String newValueScoutID = Settings.fromJson(settings).scoutID.toString();
 
     currentCompetitionValue.value = TextEditingValue(
-      text: newValueCurrentCompetition,
-      selection: TextSelection.fromPosition(
-        TextPosition(offset: newValueCurrentCompetition.length),
-      ),
+      text: newValueCurrentCompetition
     );
 
     currentScoutIDValue.value = TextEditingValue(
-      text: newValueScoutID,
-      selection: TextSelection.fromPosition(
-        TextPosition(offset: newValueScoutID.length),
-      ),
+      text: newValueScoutID
     );
   }
 

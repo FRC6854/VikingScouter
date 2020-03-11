@@ -32,33 +32,8 @@ Map<String, dynamic> jsonTemplateItems = {
       "value": 0
     },
     {
-      "name": "Sandstorm",
+      "name": "Autonomous",
       "type": "header",
-      "value": 0
-    },
-    {
-      "name": "Cargo Ship Hatch Panels Sandstorm",
-      "type": "counter",
-      "value": 0
-    },
-    {
-      "name": "Demo Note",
-      "type": "note",
-      "value": ""
-    },
-    {
-      "name": "Cargo Ship Cargo Sandstorm",
-      "type": "counter",
-      "value": 0
-    },
-    {
-      "name": "Rocket Hatch Panels Sandstorm",
-      "type": "counter",
-      "value": 0
-    },
-    {
-      "name": "Rocket Cargo Sandstorm",
-      "type": "counter",
       "value": 0
     },
     {
@@ -67,27 +42,27 @@ Map<String, dynamic> jsonTemplateItems = {
       "value": false
     },
     {
+      "name": "High Goal",
+      "type": "counter",
+      "value": 0
+    },
+    {
+      "name": "Low Goal",
+      "type": "counter",
+      "value": 0
+    },
+    {
       "name": "Teleop",
       "type": "header",
       "value": 0
     },
     {
-      "name": "Cargo Ship Hatch Panels",
+      "name": "High Goal",
       "type": "counter",
       "value": 0
     },
     {
-      "name": "Cargo Ship Cargo",
-      "type": "counter",
-      "value": 0
-    },
-    {
-      "name": "Rocket Hatch Panels",
-      "type": "counter",
-      "value": 0
-    },
-    {
-      "name": "Rocket Cargo",
+      "name": "Low Goal",
       "type": "counter",
       "value": 0
     },
@@ -97,20 +72,20 @@ Map<String, dynamic> jsonTemplateItems = {
       "value": 0
     },
     {
-      "name": "Total RP",
-      "type": "number",
-      "value": 0
+      "name": "Climb?",
+      "type": "checkbox",
+      "value": false
     },
     {
-      "name": "Total Points for Team",
-      "type": "number",
-      "value": 0
+      "name": "Balanced?",
+      "type": "checkbox",
+      "value": false
     },
     {
-      "name": "Level of Climb",
-      "type": "number",
-      "value": 0
-    }
+      "name": "Notes",
+      "type": "note",
+      "value": ""
+    },
   ]
 };
 
